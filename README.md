@@ -7,6 +7,8 @@ Script **MUST** be placed to **where EcoServer.exe file** resides.
 
 It operates at **24 hour** format so `9:00PM` should be defined as `21:00` and so on.
 
+**If EcoServer crashes** for whatever reason it will also be automatically restarted. This check is made **every 10 seconds**.
+
 Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at this time script resets its flags. If you want restart at midnight use `00:01` for example.
 
 # How to use the script
