@@ -23,7 +23,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 4. Generate **Eco User Token** on **https://play.eco/account** in **Server Authentication** section.
 
-5. **Edit** the script _(**[VisualStudioCode](https://https://code.visualstudio.com//)** recommended)_ and **update** the line `"--userToken=YOUR_ECO_TOKEN_HERE"` with your token from the webpage. Make sure you preserve `--userToken=` and not replace it whole.
+5. **Edit** the script _(**[VisualStudioCode](https://code.visualstudio.com//)** recommended)_ and **update** the line `"--userToken=YOUR_ECO_TOKEN_HERE"` with your token from the webpage. Make sure you preserve `--userToken=` and not replace it whole.
 
 6. Declare restart times in `restartTimes` variable.
 ```powershell
