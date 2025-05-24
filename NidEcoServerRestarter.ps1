@@ -2,10 +2,10 @@
 $host.UI.RawUI.WindowTitle = "Nid Eco Server Restarter"
 
 # ------------------------ CONFIGURATION ------------------------
-# Set up to 3 scheduled restart times in 24-hour format (HH:mm)
+# Set restart times in 24-hour format (HH:mm), following the below example - multiple restart times may be added.
 $restartTimes = @(
-    "19:26",
-    "19:30"
+    "01:00",
+    "13:00"
 )
 
 #EcoServer.exe
