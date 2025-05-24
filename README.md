@@ -21,7 +21,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 3. Generate **Eco User Token** on **https://play.eco/account** in **Server Authentication** section.
 
-4. **Edit** the script and **update** the line `"--userToken=YOUR_ECO_TOKEN_HERE"` with your token from the webpage. Make sure you preserve `--userToken=` and not replace it whole.
+4. **Edit** the script _(**[VisualStudioCode](https://https://code.visualstudio.com//)** recommended)_ and **update** the line `"--userToken=YOUR_ECO_TOKEN_HERE"` with your token from the webpage. Make sure you preserve `--userToken=` and not replace it whole.
 
 5. **Run** the script. If Eco Server is not runnig, it will start it automatically.
 
