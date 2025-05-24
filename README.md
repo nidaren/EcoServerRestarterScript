@@ -37,4 +37,4 @@ $restartTimes = @(
 
 # Future updates
 
-* Ensre the server saves before closing. To get this functionalit now, use RCON command `/manage save` bofore server exit.
+* Ensure the server saves before closing. To get this functionality now, use RCON command `/manage save` bofore server exit.
