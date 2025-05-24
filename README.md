@@ -11,6 +11,9 @@ It operates at **24 hour** format so `9:00PM` should be defined as `21:00` and s
 
 Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at this time script resets its flags. If you want restart at midnight use `00:01` for example.
 
+# File logger
+**File logger** will be placed in the same directory as the script, its name can be changed in the `Configuration` section of the script. It saves the time of the events within the script.
+
 # How to use the script
 1. **Download** the script from the **releases** section.
 
