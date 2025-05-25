@@ -5,6 +5,8 @@ This is a PowerShell script will restart **Eco Server** at the specifed hours. I
 
 Script **MUST** be placed to **where EcoServer.exe file** resides.
 
+Script can run on account **WITH** or **WITHOUT** administrative priviledges. In case of lack of admin rights, skip step 3 of How-To-Use section.
+
 It operates at **24 hour** format so `9:00PM` should be defined as `21:00` and so on.
 
 **If EcoServer crashes** for whatever reason it will also be automatically restarted. This check is made **every 10 seconds**.
