@@ -1,8 +1,8 @@
 # ------------------------ CONFIGURATION ------------------------
 $flagsResetTime = "00:00"                  # Time to reset restart flags
 $ecoServerPath = "EcoServer.exe"           # Path to EcoServer executable
-$processName = "EcoServer"                  # Process name without extension
-$logFile = "NidEcoServerRestartLog.log"       # Log file path
+$processName = "EcoServer"                 # Process name without extension
+$logFile = "NidEcoServerRestartLog.log"    # Log file path
 $configFilePath = "NidEcoRestarter.json"   # JSON config file path
 
 # ------------------------ LOAD CONFIG FILE ------------------------
