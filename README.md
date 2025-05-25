@@ -3,6 +3,8 @@ This is a PowerShell script will restart **Eco Server** at the specifed hours. I
 
 # Important notes
 
+Regular users **DO NOT NEED** to edit the `.ps1 script file` directly. Eco token and restart times can be defined in `NidEcoRestarter.json`. This ensures that when script is updated none of your settings are lost.
+
 Script **MUST** be placed to **where EcoServer.exe file** resides.
 
 Script can run on account **WITH** or **WITHOUT** administrative priviledges. In case of lack of admin rights, skip step 3 of How-To-Use section.
@@ -21,28 +23,16 @@ Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at
 
 2. **Unpack** files to where `EcoServer.exe` file sits. 
 
-3. If you are **NOT on Windows Server** and you have **administrative priviledges** on operating system - **Allow execution** of **locally saved `PowerShell` scripts**. To do so `Open PowerShell` in `Windows Terminal` and execute the command:
-```powershell
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
+3. Generate **Eco User Token** on **https://play.eco/account** in **Server Authentication** section.
 
-4. If you **DO NOT** have an account with **administrative priviledges** on the host system, skip step 3.
+4. **Edit** file `NidEcoRestarter.json` and:
 
-5. Generate **Eco User Token** on **https://play.eco/account** in **Server Authentication** section.
+    * Paste your token from step 5 into `"YOUR_ECO_TOKEN_HERE"` section. Make sure _you preserve quotations_ around it.
+    * Edit Restart Times in `RestartTimes` section.
 
-6. **Edit** the script _(**[VisualStudioCode](https://code.visualstudio.com//)** recommended)_ and **update** the line `"--userToken=YOUR_ECO_TOKEN_HERE"` with your token from the webpage. Make sure you preserve `--userToken=` and not replace it whole.
+5. Right click on both `NidEcoRestarterLauncher.cmd` and `NidEcoServerRestarter.ps1` and select `Unblock` then `Apply`. Files downloaded from internet are by default blocked on some systems.
 
-7. Declare restart times in `restartTimes` variable.
-```powershell
-$restartTimes = @(
-    "01:00",
-    "13:00"
-)
-```
-
-8. Right click on both `NidEcoRestarterLauncher.cmd` and `NidEcoServerRestarter.ps1` and select `Unblock` then `Apply`. Files downloaded from internet are by default blocked on some systems.
-
-9. **Run** `NidEcoRestarterLauncher.cmd` to run the script - it will run on accounts _without administrative priviledges_. It also ensures that script can be executed even on hosting systems with restrictive group policy. If you have full control over your host system you can also run script directly.
+6. **Run** `NidEcoRestarterLauncher.cmd` to run the script - it will run on accounts _without administrative priviledges_. It also ensures that script can be executed even on hosting systems with restrictive group policy. Do not run .ps1 script file directly.
 
 # Future updates
 

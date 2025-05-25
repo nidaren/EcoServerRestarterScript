@@ -1,23 +1,31 @@
-# ------------------------ INIT ------------------------
-$host.UI.RawUI.WindowTitle = "Nid Eco Server Restarter"
-
 # ------------------------ CONFIGURATION ------------------------
-# Set restart times in 24-hour format (HH:mm), following the below example - multiple restart times may be added.
-$restartTimes = @(
-    "01:00",
-    "13:00"
-)
+$flagsResetTime = "00:00"                  # Time to reset restart flags
+$ecoServerPath = "EcoServer.exe"           # Path to EcoServer executable
+$processName = "EcoServer"                  # Process name without extension
+$logFile = "NidEcoServerRestartLog.log"       # Log file path
+$configFilePath = "NidEcoRestarter.json"   # JSON config file path
 
-#EcoServer.exe
-$ecoServerPath = "EcoServer.exe"
-#EcoServer.exe arguments
-$ecoServerArgs = "--userToken=YOUR_ECO_TOKEN_HERE"   # <-- set your user token here
+# ------------------------ LOAD CONFIG FILE ------------------------
+if (Test-Path $configFilePath) {
+    try {
+        $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
+        $ecoUserToken = $config.EcoUserToken.Trim()
+        $restartTimes = $config.RestartTimes
+        $windowTitle = if ($config.WindowTitle) { $config.WindowTitle } else { "Nid Eco Server Restarter" }
+        $ecoServerArgs = "--userToken=$ecoUserToken"
+    }
+    catch {
+        Write-Host "ERROR: Failed to parse config file. $_" -ForegroundColor Red
+        exit 1
+    }
+}
+else {
+    Write-Host "ERROR: Config file '$configFilePath' not found." -ForegroundColor Red
+    exit 1
+}
 
-# Name of the process without extension
-$processName = "EcoServer"
-
-# LogFile
-$logFile = "EcoServerRestartLog.log"
+# ------------------------ INIT ------------------------
+$host.UI.RawUI.WindowTitle = $windowTitle
 
 # ------------------------ STARTUP CHECK ------------------------
 Write-Host "Nid Eco Server Restarter is starting up..."
@@ -44,6 +52,7 @@ Write-Host "Watching for restarts at: $($restartTimes -join ', ')"
 Write-Host "---------------------------------------------------"
 
 $alreadyRestarted = @{}
+$hasResetFlags = $false
 $lastCheckEcoServer = (Get-Date).AddSeconds(-10)
 
 # ------------------------ MAIN LOOP ------------------------
@@ -105,12 +114,16 @@ while ($true) {
                 Write-Host $errorMsg -ForegroundColor Red
             }
         }
+    }
 
-        # Reset restart flags at midnight
-        if ($currentTime -eq "00:00") {
-            $alreadyRestarted.Clear()
-            Write-Host "`n[Midnight] Restart flags reset."
-        }
+    # Reset restart flags once at flagsResetTime
+    if ($currentTime -eq $flagsResetTime -and -not $hasResetFlags) {
+        $alreadyRestarted.Clear()
+        Write-Host "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Restart flags reset."
+        $hasResetFlags = $true
+    }
+    elseif ($currentTime -ne $flagsResetTime -and $hasResetFlags) {
+        $hasResetFlags = $false
     }
 
     Start-Sleep -Seconds 1
