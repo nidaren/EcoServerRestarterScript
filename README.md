@@ -30,6 +30,12 @@ This is a PowerShell script will restart **Eco Server** at the specifed hours. I
 # File logger
 **File logger** will be placed in the same directory as the script, its name can be changed in the `Configuration` section of the script. It saves the time of the events within the script.
 
+# Removal
+
+* **Manual**: Delete the unpacked files.
+
+* **Automatic**: Use `NidRestarterRemover.cmd` available in Releases on [GitHub](https://github.com/nidaren/EcoServerRestarterScript)
+
 # Important notes
 
 Regular users **DO NOT NEED** to edit the `.ps1 script file` directly. Eco token and restart times can be defined in `NidEcoRestarter.json`. This ensures that when script is updated none of your settings are lost.
