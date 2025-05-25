@@ -34,7 +34,7 @@ This is a PowerShell script will restart **Eco Server** at the specifed hours. I
 
 * **Manual**: Delete the unpacked files.
 
-* **Automatic**: Use `NidRestarterRemover.cmd` available in Releases on [GitHub](https://github.com/nidaren/EcoServerRestarterScript)
+* **Automatic**: Download `NidRestarterRemover.cmd` available in Releases on [GitHub](https://github.com/nidaren/EcoServerRestarterScript). **Drop it** to the folder containing `EcoServer.exe` and run.
 
 # Important notes
 
