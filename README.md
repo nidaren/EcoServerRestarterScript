@@ -7,7 +7,7 @@ Regular users **DO NOT NEED** to edit the `.ps1 script file` directly. Eco token
 
 Script **MUST** be placed to **where EcoServer.exe file** resides.
 
-Script can run on account **WITH** or **WITHOUT** administrative priviledges. In case of lack of admin rights, skip step 3 of How-To-Use section.
+It can run without admin priviledges on the host system.
 
 It operates at **24 hour** format so `9:00PM` should be defined as `21:00` and so on.
 
