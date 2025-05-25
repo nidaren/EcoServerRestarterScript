@@ -27,7 +27,7 @@ Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at
 
 4. **Edit** file `NidEcoRestarter.json` and:
 
-    * Paste your token from step 5 into `"YOUR_ECO_TOKEN_HERE"` section. Make sure _you preserve quotations_ around it.
+    * Paste your token from step 3 into `"YOUR_ECO_TOKEN_HERE"` section. Make sure _you preserve quotations_ around it.
     * Edit Restart Times in `RestartTimes` section.
 
 5. Right click on both `NidEcoRestarterLauncher.cmd` and `NidEcoServerRestarter.ps1` and select `Unblock` then `Apply`. Files downloaded from internet are by default blocked on some systems.
