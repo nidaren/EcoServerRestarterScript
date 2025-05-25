@@ -1,19 +1,13 @@
 # Eco Server Restarter Script
 This is a PowerShell script will restart **Eco Server** at the specifed hours. It is designed to work on **Windows** hosts.
 
-# Important notes
+# Features
 
-Regular users **DO NOT NEED** to edit the `.ps1 script file` directly. Eco token and restart times can be defined in `NidEcoRestarter.json`. This ensures that when script is updated none of your settings are lost.
-
-Script **MUST** be placed to **where EcoServer.exe file** resides.
-
-It can run without admin priviledges on the host system.
-
-It operates at **24 hour** format so `9:00PM` should be defined as `21:00` and so on.
-
-**If EcoServer crashes** for whatever reason it will also be automatically restarted. This check is made **every 10 seconds**.
-
-Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at this time script resets its flags. If you want restart at midnight use `00:01` for example.
+* It can run **without admin priviledges** on the host system.
+* Terminates `EcoServer` properly via `SIGINT` signal.
+* Allows `EcoServer` **to save** before exiting.
+* Supports **multiple restart hours** - only two defined, but additional may be added too.
+* Detects **EcoServer crashes** and restarts it if needed.
 
 # File logger
 **File logger** will be placed in the same directory as the script, its name can be changed in the `Configuration` section of the script. It saves the time of the events within the script.
@@ -34,6 +28,18 @@ Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at
 
 6. **Run** `NidEcoRestarterLauncher.cmd` to run the script - it will run on accounts _without administrative priviledges_. It also ensures that script can be executed even on hosting systems with restrictive group policy. Do not run .ps1 script file directly.
 
-# Future updates
+# Important notes
 
-* Ensure the server saves before closing. To get this functionality now, use RCON command `manage save` bofore server exit.
+Regular users **DO NOT NEED** to edit the `.ps1 script file` directly. Eco token and restart times can be defined in `NidEcoRestarter.json`. This ensures that when script is updated none of your settings are lost.
+
+Script **MUST** be placed to **where EcoServer.exe file** resides.
+
+It operates at **24 hour** format so `9:00PM` should be defined as `21:00` and so on.
+
+**If EcoServer crashes** for whatever reason it will also be automatically restarted. This check is made **every 10 seconds**.
+
+Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at this time script resets its flags. If you want restart at midnight use `00:01` for example.
+
+# Attributions
+
+Uses `wk.exe` for proper signal sending. Use is under MIT license and original project page as well as source code is located at https://github.com/ElyDotDev/windows-kill

@@ -1,9 +1,9 @@
 # ------------------------ CONFIGURATION ------------------------
-$flagsResetTime = "00:00"                  # Time to reset restart flags
-$ecoServerPath = "EcoServer.exe"           # Path to EcoServer executable
-$processName = "EcoServer"                 # Process name without extension
-$logFile = "NidEcoServerRestartLog.log"    # Log file path
-$configFilePath = "NidEcoRestarter.json"   # JSON config file path
+$flagsResetTime = "00:00"
+$ecoServerPath = "EcoServer.exe"
+$processName = "EcoServer"
+$logFile = "NidEcoServerRestartLog.log"
+$configFilePath = "NidEcoRestarter.json"
 
 # ------------------------ LOAD CONFIG FILE ------------------------
 if (Test-Path $configFilePath) {
@@ -15,41 +15,57 @@ if (Test-Path $configFilePath) {
         $ecoServerArgs = "--userToken=$ecoUserToken"
     }
     catch {
-        Write-Host "ERROR: Failed to parse config file. $_" -ForegroundColor Red
+        Write-Host "$(Get-Timestamp) ERROR: Failed to parse config file. $_" -ForegroundColor Red
         exit 1
     }
 }
 else {
-    Write-Host "ERROR: Config file '$configFilePath' not found." -ForegroundColor Red
+    Write-Host "$(Get-Timestamp) ERROR: Config file '$configFilePath' not found." -ForegroundColor Red
     exit 1
+}
+
+# ------------------------ TIMESTAMP FUNCTION ------------------------
+function Get-Timestamp {
+    return "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')]"
 }
 
 # ------------------------ INIT ------------------------
 $host.UI.RawUI.WindowTitle = $windowTitle
 
+# Resolve script folder to get wk.exe path
+$scriptFolder = Split-Path -Parent $MyInvocation.MyCommand.Path
+$wkExePath = Join-Path $scriptFolder "NidEcoServerRestarter\wk.exe"
+# Check if wk.exe exists
+if (-not (Test-Path $wkExePath)) {
+    $errorMsg = "$(Get-Timestamp) ERROR: wk.exe not found at '$wkExePath'. Exiting..."
+    Write-Host $errorMsg -ForegroundColor Red
+    Add-Content -Path $logFile -Value $errorMsg
+    exit 1
+}
+
 # ------------------------ STARTUP CHECK ------------------------
-Write-Host "Nid Eco Server Restarter is starting up..."
+Write-Host "$(Get-Timestamp) Nid Eco Server Restarter is starting up..."
 $process = Get-Process -Name $processName -ErrorAction SilentlyContinue
 if (-not $process) {
-    Write-Host "EcoServer is not running. Starting it now..."
+    Write-Host "$(Get-Timestamp) EcoServer is not running. Starting it now..."
     try {
         Start-Process -FilePath $ecoServerPath -ArgumentList $ecoServerArgs
-        Write-Host "EcoServer started successfully."
-        $message = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] - Started EcoServer.exe at script startup"
+        Write-Host "$(Get-Timestamp) EcoServer started successfully."
+        $message = "$(Get-Timestamp) - Started EcoServer.exe at script startup"
         Add-Content -Path $logFile -Value $message
     }
     catch {
-        Write-Host "Failed to start EcoServer: $_" -ForegroundColor Red
-        $errorMsg = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] - ERROR starting EcoServer at startup: $_"
+        Write-Host "$(Get-Timestamp) Failed to start EcoServer: $_" -ForegroundColor Red
+        $errorMsg = "$(Get-Timestamp) - ERROR starting EcoServer at startup: $_"
         Add-Content -Path $logFile -Value $errorMsg
     }
 }
 else {
-    Write-Host "EcoServer is already running."
+    Write-Host "$(Get-Timestamp) EcoServer is already running."
 }
 
-Write-Host "Watching for restarts at: $($restartTimes -join ', ')"
-Write-Host "---------------------------------------------------"
+Write-Host "$(Get-Timestamp) Watching for restarts at: $($restartTimes -join ', ')"
+Write-Host "-----------------------------------------------------------------"
 
 $alreadyRestarted = @{}
 $hasResetFlags = $false
@@ -64,16 +80,16 @@ while ($true) {
     if (($now - $lastCheckEcoServer).TotalSeconds -ge 10) {
         $process = Get-Process -Name $processName -ErrorAction SilentlyContinue
         if (-not $process) {
-            Write-Host "EcoServer is NOT running. Starting process..."
+            Write-Host "$(Get-Timestamp) EcoServer is NOT running. Starting process..."
             try {
                 Start-Process -FilePath $ecoServerPath -ArgumentList $ecoServerArgs
-                Write-Host "EcoServer started successfully."
-                $message = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] - Started EcoServer.exe (not running)"
+                Write-Host "$(Get-Timestamp) EcoServer started successfully."
+                $message = "$(Get-Timestamp) - Started EcoServer.exe (not running)"
                 Add-Content -Path $logFile -Value $message
             }
             catch {
-                Write-Host "Failed to start EcoServer: $_" -ForegroundColor Red
-                $errorMsg = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] - ERROR starting EcoServer: $_"
+                Write-Host "$(Get-Timestamp) Failed to start EcoServer: $_" -ForegroundColor Red
+                $errorMsg = "$(Get-Timestamp) - ERROR starting EcoServer: $_"
                 Add-Content -Path $logFile -Value $errorMsg
             }
         }
@@ -84,34 +100,55 @@ while ($true) {
     foreach ($restartTime in $restartTimes) {
         if ($currentTime -eq $restartTime -and !$alreadyRestarted.ContainsKey($restartTime)) {
             try {
-                Write-Host "`n[$($now.ToString("yyyy-MM-dd HH:mm:ss"))] Restart time matched: $restartTime"
-                Write-Host "Force killing EcoServer.exe..."
+                Write-Host "$(Get-Timestamp) Restart time matched: $restartTime"
 
                 $process = Get-Process -Name $processName -ErrorAction SilentlyContinue
-
                 if ($process) {
-                    $process.Kill()
-                    Write-Host "EcoServer process killed."
+                    $processId = $process.Id
+
+                    try {
+                        Write-Host "$(Get-Timestamp) Sending SIGINT to EcoServer process ID $processId using wk.exe..."
+                        Start-Process -FilePath $wkExePath -ArgumentList "-SIGINT $processId" -WindowStyle Hidden -Wait
+                        Write-Host "$(Get-Timestamp) SIGINT sent successfully. Waiting 10 seconds..."
+                        Start-Sleep -Seconds 10
+                    }
+                    catch {
+                        Write-Host "$(Get-Timestamp) WARNING: Error sending SIGINT: $_" -ForegroundColor Yellow
+                    }
+
+                    # Check if process still exists and kill if necessary
+                    $procCheck = Get-Process -Id $processId -ErrorAction SilentlyContinue
+                    if ($procCheck) {
+                        Write-Host "$(Get-Timestamp) Process ID $processId is still running. Killing now..."
+                        try {
+                            $procCheck.Kill()
+                            Write-Host "$(Get-Timestamp) Process ID $processId killed successfully."
+                        }
+                        catch {
+                            Write-Host ("$(Get-Timestamp) ERROR killing process ID {0}: {1}" -f $processId, $_) -ForegroundColor Red
+                        }
+                    }
+                    else {
+                        Write-Host "$(Get-Timestamp) Process ID $processId exited gracefully after SIGINT."
+                    }
                 }
                 else {
-                    Write-Host "EcoServer process not found."
+                    Write-Host "$(Get-Timestamp) EcoServer process not found before restart."
                 }
 
-                Start-Sleep -Seconds 5
-
-                Write-Host "Starting EcoServer..."
+                Write-Host "$(Get-Timestamp) Starting EcoServer..."
                 Start-Process -FilePath $ecoServerPath -ArgumentList $ecoServerArgs
-                Write-Host "EcoServer restarted successfully."
+                Write-Host "$(Get-Timestamp) EcoServer restarted successfully."
 
-                $message = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] - Restarted EcoServer.exe at $restartTime"
+                $message = "$(Get-Timestamp) - Restarted EcoServer.exe at $restartTime"
                 Add-Content -Path $logFile -Value $message
 
                 $alreadyRestarted[$restartTime] = $true
             }
             catch {
-                $errorMsg = "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] - ERROR: $_"
+                Write-Host ("$(Get-Timestamp) ERROR during restart: {0}" -f $_) -ForegroundColor Red
+                $errorMsg = "$(Get-Timestamp) - ERROR: $_"
                 Add-Content -Path $logFile -Value $errorMsg
-                Write-Host $errorMsg -ForegroundColor Red
             }
         }
     }
@@ -119,7 +156,7 @@ while ($true) {
     # Reset restart flags once at flagsResetTime
     if ($currentTime -eq $flagsResetTime -and -not $hasResetFlags) {
         $alreadyRestarted.Clear()
-        Write-Host "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Restart flags reset."
+        Write-Host "$(Get-Timestamp) Restart flags reset."
         $hasResetFlags = $true
     }
     elseif ($currentTime -ne $flagsResetTime -and $hasResetFlags) {
