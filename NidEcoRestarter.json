@@ -1,0 +1,8 @@
+{
+  "EcoUserToken": "YOUR_ECO_TOKEN_HERE",
+  "RestartTimes": [
+    "01:00",
+    "13:00"
+  ],
+  "WindowTitle": "Nid Eco Server Restarter"
+}
