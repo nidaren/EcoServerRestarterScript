@@ -17,18 +17,20 @@ Please **<ins>DO NOT</ins> define exact midnight** `00:00` as restart hour as at
 # How to use the script
 1. **Download** the script from the **releases** section.
 
-2. **Unpack** script where `EcoServer.exe` file sits. 
+2. **Unpack** files to where `EcoServer.exe` file sits. 
 
-3. If you are **NOT on Windows Server** operating system - **Allow execution** of **locally saved `PowerShell` scripts**. To do so `Open PowerShell` in `Windows Terminal` and execute the command:
+3. If you are **NOT on Windows Server** and you have **administrative priviledges** on operating system - **Allow execution** of **locally saved `PowerShell` scripts**. To do so `Open PowerShell` in `Windows Terminal` and execute the command:
 ```powershell
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-4. Generate **Eco User Token** on **https://play.eco/account** in **Server Authentication** section.
+4. If you **DO NOT** have an account with **administrative priviledges** on the host system, skip step 3.
 
-5. **Edit** the script _(**[VisualStudioCode](https://code.visualstudio.com//)** recommended)_ and **update** the line `"--userToken=YOUR_ECO_TOKEN_HERE"` with your token from the webpage. Make sure you preserve `--userToken=` and not replace it whole.
+5. Generate **Eco User Token** on **https://play.eco/account** in **Server Authentication** section.
 
-6. Declare restart times in `restartTimes` variable.
+6. **Edit** the script _(**[VisualStudioCode](https://code.visualstudio.com//)** recommended)_ and **update** the line `"--userToken=YOUR_ECO_TOKEN_HERE"` with your token from the webpage. Make sure you preserve `--userToken=` and not replace it whole.
+
+7. Declare restart times in `restartTimes` variable.
 ```powershell
 $restartTimes = @(
     "01:00",
@@ -36,8 +38,10 @@ $restartTimes = @(
 )
 ```
 
-7. **Run** the script. If Eco Server is not runnig, it will start it automatically.
+8. Right click on both `NidEcoRestarterLauncher.cmd` and `NidEcoServerRestarter.ps1` and select `Unblock` then `Apply`. Files downloaded from internet are by default blocked on some systems.
+
+9. **Run** `NidEcoRestarterLauncher.cmd` to run the script - it will run on accounts _without administrative priviledges_. It also ensures that script can be executed even on hosting systems with restrictive group policy. If you have full control over your host system you can also run script directly.
 
 # Future updates
 
-* Ensure the server saves before closing. To get this functionality now, use RCON command `/manage save` bofore server exit.
+* Ensure the server saves before closing. To get this functionality now, use RCON command `manage save` bofore server exit.
