@@ -4,5 +4,6 @@
     "01:00",
     "13:00"
   ],
+  "SaveWaitTime": 120,
   "WindowTitle": "Nid Eco Server Restarter"
 }
