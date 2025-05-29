@@ -5,13 +5,47 @@ $processName = "EcoServer"
 $logFile = "NidEcoServerRestartLog.log"
 $configFilePath = "NidEcoRestarter.json"
 
+# ------------------------ TIMESTAMP FUNCTION ------------------------
+function Get-Timestamp {
+    return "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')]"
+}
+
 # ------------------------ LOAD CONFIG FILE ------------------------
 if (Test-Path $configFilePath) {
     try {
         $config = Get-Content -Path $configFilePath -Raw | ConvertFrom-Json
-        $ecoUserToken = $config.EcoUserToken.Trim()
-        $restartTimes = $config.RestartTimes
-        $windowTitle = if ($config.WindowTitle) { $config.WindowTitle } else { "Nid Eco Server Restarter" }
+
+        # Assign values with fallbacks if null or empty
+        $ecoUserToken = if ($config.EcoUserToken -and $config.EcoUserToken.Trim()) { 
+            $config.EcoUserToken.Trim() 
+        } else { 
+            "default-user-token" 
+        }
+
+        $restartTimes = if ($config.RestartTimes) { 
+            $config.RestartTimes 
+        } else { 
+            @("01:00", "13:00")  # Default restart times as array
+        }
+
+        $windowTitle = if ($config.WindowTitle) { 
+            $config.WindowTitle 
+        } else { 
+            "Nid Eco Server Restarter" 
+        }                
+
+        $saveWaitTime = if ($config.SaveWaitTime) { 
+            $config.SaveWaitTime 
+        } else {             
+            120
+        }
+
+        if (-not $config.SaveWaitTime) {
+            Write-Host "$(Get-Timestamp) ERROR: Failed to load SaveWaitTime value from your config file." -ForegroundColor Yellow
+            Write-Host "$(Get-Timestamp) Download updated config .json from GitHub project page. Or Add this value manually." -ForegroundColor Yellow
+            Write-Host "$(Get-Timestamp) Default value of 120 seconds will be used." -ForegroundColor Yellow
+        }
+
         $ecoServerArgs = "--userToken=$ecoUserToken"
     }
     catch {
@@ -22,11 +56,6 @@ if (Test-Path $configFilePath) {
 else {
     Write-Host "$(Get-Timestamp) ERROR: Config file '$configFilePath' not found." -ForegroundColor Red
     exit 1
-}
-
-# ------------------------ TIMESTAMP FUNCTION ------------------------
-function Get-Timestamp {
-    return "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')]"
 }
 
 # ------------------------ INIT ------------------------
@@ -109,8 +138,8 @@ while ($true) {
                     try {
                         Write-Host "$(Get-Timestamp) Sending SIGINT to EcoServer process ID $processId using wk.exe..."
                         Start-Process -FilePath $wkExePath -ArgumentList "-SIGINT $processId" -WindowStyle Hidden -Wait
-                        Write-Host "$(Get-Timestamp) SIGINT sent successfully. Waiting 10 seconds..."
-                        Start-Sleep -Seconds 10
+                        Write-Host "$(Get-Timestamp) SIGINT sent successfully. Waiting $saveWaitTime seconds..."
+                        Start-Sleep -Seconds $saveWaitTime
                     }
                     catch {
                         Write-Host "$(Get-Timestamp) WARNING: Error sending SIGINT: $_" -ForegroundColor Yellow
